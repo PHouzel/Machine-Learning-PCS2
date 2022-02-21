@@ -95,7 +95,7 @@ stimuli = np.vstack([stimuli_run[:-2] for stimuli_run in stimuli]).astype(float)
 ##############################################################################
 # fmri_data is a matrix of *samples* x *voxels*
 
-print(fmri_data.shape)
+#print(fmri_data.shape)
 
 ##############################################################################
 # We flatten the last two dimensions of stimuli
@@ -104,7 +104,7 @@ print(fmri_data.shape)
 # Flatten the stimuli
 stimuli = np.reshape(stimuli, (-1, stimulus_shape[0] * stimulus_shape[1]))
 
-print(stimuli.shape)
+#print(stimuli.shape)
 
 ##############################################################################
 # Building the encoding models
@@ -138,7 +138,10 @@ for train, test in cv.split(X=stimuli):
     # we compute how much variance our encoding model explains in each voxel
     scores.append(r2_score(fmri_data[test], predictions,
                            multioutput='raw_values'))
-
+print(type(predictions))
+print(type(scores))
+print(len(scores))
+"""
 ##############################################################################
 # Mapping the encoding scores on the brain
 # ----------------------------------------
@@ -257,3 +260,4 @@ plt.colorbar(ax_im, ax=ax)
 # roughly maps to the relative location of the voxels to each other.
 # We can see a relationship between some voxel's receptive field and
 # its location in the brain.
+"""
