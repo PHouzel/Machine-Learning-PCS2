@@ -53,7 +53,7 @@ stimuli_random_runs_filenames = dataset.label[12:]
 # data, clean and mask it.
 
 import numpy as np
-from nilearn.input_data import MultiNiftiMasker
+from nilearn.maskers import MultiNiftiMasker
 
 masker = MultiNiftiMasker(mask_img=dataset.mask, detrend=True,
                           standardize=True)
@@ -67,7 +67,7 @@ stimulus_shape = (10, 10)
 stimuli = []
 for stimulus_run in stimuli_random_runs_filenames:
     stimuli.append(np.reshape(np.loadtxt(stimulus_run,
-                              dtype=np.int, delimiter=','),
+                              dtype=int, delimiter=','),
                               (-1,) + stimulus_shape, order='F'))
 
 ##############################################################################

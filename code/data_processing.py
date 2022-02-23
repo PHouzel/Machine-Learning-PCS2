@@ -78,27 +78,38 @@ def inverse_transform_fmri_data(fmri_data, masker):
 
 fmri_data, stimuli, masker = load_and_mask_miyawaki_data()
 
-X_train = fmri_data
-y_train = stimuli
-
 from sklearn.linear_model import Ridge 
 from sklearn.model_selection import KFold
+from sklearn.metrics import r2_score
 
-kf = KFold(n_splits=10)
-kf.get_n_splits(X_train)
 
 # Fit ridge model, calculate predictions on left out data
 # and evaluate r^2 score for each voxel
 
-scores = []
+"""scores = []
 print("Training...")
-for train, test in tqdm(kf.split(X_train)):
-     pred = (Ridge(alpha=100.).fit(y_train[train], X_train[train]).predict(y_train[test]))
-     X_true = X_train[test]
-     scores.append(
-         1. - ((X_true - pred)
-            ** 2).sum(axis=0) /
-         ((X_true - X_true.mean(axis=0))
-            ** 2).sum(axis=0))
+clf = (Ridge(alpha=100.))
+clf.fit(X_train, y_train)
+pred = clf.predict(X_test)
+scores.append(r2_score(y_test, pred))
      
-mean_scores = np.mean(scores, axis=0)
+print(scores)"""
+
+from sklearn.metrics import r2_score
+
+estimator = Ridge(alpha=100.)
+cv = KFold(n_splits=10)
+
+scores = []
+for train, test in cv.split(X=stimuli):
+    # we train the Ridge estimator on the training set
+    # and predict the fMRI activity for the test set
+    predictions = Ridge(alpha=100.).fit(
+    stimuli.reshape(-1, 100)[train], fmri_data[train]).predict(
+        stimuli.reshape(-1, 100)[test])
+    # we compute how much variance our encoding model explains in each voxel
+    scores.append(r2_score(fmri_data[test], predictions,
+                           multioutput='raw_values'))
+cut_score = np.mean(scores, axis=0)
+
+print(cut_score)
