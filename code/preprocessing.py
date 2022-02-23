@@ -9,11 +9,34 @@ Created on Wed Feb 16 12:25:31 2022
 import time
 import sys
 import numpy as np
+import nibabel
 from nilearn.maskers import MultiNiftiMasker
+import matplotlib.pyplot as plt
 from nilearn import datasets
-from tqdm import tqdm
 
 np.set_printoptions(threshold=sys.maxsize)
+
+miyawaki_dataset = datasets.fetch_miyawaki2008()
+
+def plt_background():
+    # Load image
+    bg_img = nibabel.load(miyawaki_dataset.background)
+    bg = bg_img.get_fdata()
+    # Keep values over 6000 as artificial activation map
+    act = bg.copy()
+    act[act < 6000] = 0.
+    # Display the background
+    plt.imshow(bg[..., 10].T, origin='lower',
+               interpolation='nearest', cmap='gray')
+    # Mask background values of activation map
+    masked_act = np.ma.masked_equal(act, 0.)
+    plt.imshow(masked_act[..., 10].T, origin=
+               'lower', interpolation='nearest',
+               cmap='hot')
+    # Cosmetics: disable axis
+    plt.axis('off')
+    plt.show()
+    return
 
 def load_and_mask_miyawaki_data():
     """
@@ -30,10 +53,7 @@ def load_and_mask_miyawaki_data():
         Will be needed to get images back from the data we produce
 
     """
-    # Load dataset
-    miyawaki_dataset = datasets.fetch_miyawaki2008()
 
-    sys.stderr.write("Fetching dataset...")
     
     # training data starts after the first 12 files
     fmri_random_runs_filenames = miyawaki_dataset.func[12:]
@@ -75,41 +95,3 @@ def load_and_mask_miyawaki_data():
 
 def inverse_transform_fmri_data(fmri_data, masker):
     return
-
-fmri_data, stimuli, masker = load_and_mask_miyawaki_data()
-
-from sklearn.linear_model import Ridge 
-from sklearn.model_selection import KFold
-from sklearn.metrics import r2_score
-
-
-# Fit ridge model, calculate predictions on left out data
-# and evaluate r^2 score for each voxel
-
-"""scores = []
-print("Training...")
-clf = (Ridge(alpha=100.))
-clf.fit(X_train, y_train)
-pred = clf.predict(X_test)
-scores.append(r2_score(y_test, pred))
-     
-print(scores)"""
-
-from sklearn.metrics import r2_score
-
-estimator = Ridge(alpha=100.)
-cv = KFold(n_splits=10)
-
-scores = []
-for train, test in cv.split(X=stimuli):
-    # we train the Ridge estimator on the training set
-    # and predict the fMRI activity for the test set
-    predictions = Ridge(alpha=100.).fit(
-    stimuli.reshape(-1, 100)[train], fmri_data[train]).predict(
-        stimuli.reshape(-1, 100)[test])
-    # we compute how much variance our encoding model explains in each voxel
-    scores.append(r2_score(fmri_data[test], predictions,
-                           multioutput='raw_values'))
-cut_score = np.mean(scores, axis=0)
-
-print(cut_score)
