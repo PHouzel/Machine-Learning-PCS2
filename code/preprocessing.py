@@ -13,13 +13,12 @@ import nibabel
 from nilearn.maskers import MultiNiftiMasker
 from nilearn.masking import unmask
 import matplotlib.pyplot as plt
-import nilearn.image as image
+#import nilearn.image as image
 from nilearn import datasets
 
 np.set_printoptions(threshold=sys.maxsize)
 
 miyawaki_dataset = datasets.fetch_miyawaki2008()
-
 
 def plt_background():
     # Load image
