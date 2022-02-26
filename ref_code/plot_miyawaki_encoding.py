@@ -141,7 +141,7 @@ for train, test in cv.split(X=stimuli):
 print(type(predictions))
 print(type(scores))
 print(len(scores))
-"""
+
 ##############################################################################
 # Mapping the encoding scores on the brain
 # ----------------------------------------
@@ -260,4 +260,3 @@ plt.colorbar(ax_im, ax=ax)
 # roughly maps to the relative location of the voxels to each other.
 # We can see a relationship between some voxel's receptive field and
 # its location in the brain.
-"""
