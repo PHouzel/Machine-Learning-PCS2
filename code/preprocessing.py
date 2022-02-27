@@ -54,7 +54,9 @@ def load_and_mask_miyawaki_data():
     
     # training data starts after the first 12 files
     fmri_random_runs_filenames = miyawaki_dataset.func[12:]
+    fmri_figure_filenames = miyawaki_dataset.func[:12]
     stimuli_random_runs_filenames = miyawaki_dataset.label[12:]
+    stimuli_filenames = miyawaki_dataset.label[:12]
     
     # shape of the binary (i.e. black and white values) image in pixels
     stimulus_shape = (10, 10)
@@ -67,12 +69,17 @@ def load_and_mask_miyawaki_data():
                               standardize=False)
     masker.fit()
     fmri_data = masker.transform(fmri_random_runs_filenames)
+    fmri_figures_data = masker.transform(fmri_figure_filenames)
     
     #Load the visual stimuli from csv files
     stimuli = []
     for y in stimuli_random_runs_filenames:
         stimuli.append(np.reshape(np.loadtxt(y, dtype=int, delimiter=','),
                                   (-1,) + stimulus_shape, order='F'))
+    y_test = []
+    for y in y_figure_filenames:
+        y_test.append(np.reshape(np.loadtxt(y, dtype=np.int, delimiter=','),
+                             (-1,) + y_shape, order='F'))
 
     # We now stack the fmri and stimulus data and remove an offset in the
     # beginning/end.
