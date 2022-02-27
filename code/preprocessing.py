@@ -56,7 +56,7 @@ def load_and_mask_miyawaki_data():
     fmri_random_runs_filenames = miyawaki_dataset.func[12:]
     fmri_figure_filenames = miyawaki_dataset.func[:12]
     stimuli_random_runs_filenames = miyawaki_dataset.label[12:]
-    stimuli_filenames = miyawaki_dataset.label[:12]
+    stimuli_figures_filenames = miyawaki_dataset.label[:12]
     
     # shape of the binary (i.e. black and white values) image in pixels
     stimulus_shape = (10, 10)
@@ -76,26 +76,33 @@ def load_and_mask_miyawaki_data():
     for y in stimuli_random_runs_filenames:
         stimuli.append(np.reshape(np.loadtxt(y, dtype=int, delimiter=','),
                                   (-1,) + stimulus_shape, order='F'))
-    y_test = []
-    for y in y_figure_filenames:
-        y_test.append(np.reshape(np.loadtxt(y, dtype=np.int, delimiter=','),
-                             (-1,) + y_shape, order='F'))
+    stimuli_figures = []
+    for y in stimuli_figures_filenames:
+        stimuli_figures.append(np.reshape(np.loadtxt(y, dtype=np.int, delimiter=','),
+                             (-1,) + stimulus_shape, order='F'))
 
     # We now stack the fmri and stimulus data and remove an offset in the
     # beginning/end.
     fmri_data = np.vstack([x[2:] for x in fmri_data])
     stimuli = np.vstack([y[:-2] for y in stimuli]).astype(float)
+    fmri_figures_data = np.vstack([x[2:] for x in fmri_figures_data])
+    stimuli_figures = np.vstack([y[:-2] for y in stimuli_figures]).astype(float)
     
     # fmri_data is a matrix of *samples* x *voxels*
     print("Preprocessed fMRI data: " + str(fmri_data.shape[0]) + " samples x "+ str(fmri_data.shape[1])+" voxels")
     
     # Flatten the stimuli
     stimuli = np.reshape(stimuli, (-1, stimulus_shape[0] * stimulus_shape[1]))
+    stimuli_figures = np.reshape(stimuli_figures, (-1, stimulus_shape[0] * stimulus_shape[1]))
     print("Preprocessed stimuli data: " + str(stimuli.shape[0]) + " samples x "+ str(stimuli.shape[1])+" pixels")
+    
+    #Figures
+    print(str(stimuli_figures.shape[0]) + " geometrical figures")
+    
     
     sys.stderr.write(" Done (%.2fs).\n" % (time.time() - t0))
     
-    return fmri_data, stimuli, masker
+    return fmri_data, stimuli, fmri_figures_data, stimuli_figures, masker
 
 def inverse_transform_fmri_data(X):
     mask_img=miyawaki_dataset.mask
