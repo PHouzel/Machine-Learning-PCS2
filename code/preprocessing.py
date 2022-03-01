@@ -9,31 +9,15 @@ Created on Wed Feb 16 12:25:31 2022
 import time
 import sys
 import numpy as np
+
 import nibabel
 from nilearn.maskers import MultiNiftiMasker
-from nilearn.masking import unmask
-import matplotlib.pyplot as plt
 #import nilearn.image as image
 from nilearn import datasets
 
 np.set_printoptions(threshold=sys.maxsize)
 
 miyawaki_dataset = datasets.fetch_miyawaki2008()
-
-def plt_background():
-    # Load image
-    bg_img = nibabel.load(miyawaki_dataset.background)
-    bg = bg_img.get_fdata()
-    # Keep values over 6000 as artificial activation map
-    #act = bg.copy()
-    #act[act < 6000] = 0.
-    # Display the background
-    plt.imshow(bg[..., 10].T, origin='lower',
-               interpolation='nearest', cmap='gray')
-    # Cosmetics: disable axis
-    plt.axis('off')
-    plt.show()
-    return
 
 def load_and_mask_miyawaki_data():
     """
@@ -71,6 +55,8 @@ def load_and_mask_miyawaki_data():
     fmri_data = masker.transform(fmri_random_runs_filenames)
     fmri_figures_data = masker.transform(fmri_figure_filenames)
     
+    print("The shape of the masked data is " + str(np.shape(fmri_data)))
+    
     #Load the visual stimuli from csv files
     stimuli = []
     for y in stimuli_random_runs_filenames:
@@ -78,7 +64,7 @@ def load_and_mask_miyawaki_data():
                                   (-1,) + stimulus_shape, order='F'))
     stimuli_figures = []
     for y in stimuli_figures_filenames:
-        stimuli_figures.append(np.reshape(np.loadtxt(y, dtype=np.int, delimiter=','),
+        stimuli_figures.append(np.reshape(np.loadtxt(y, dtype=int, delimiter=','),
                              (-1,) + stimulus_shape, order='F'))
 
     # We now stack the fmri and stimulus data and remove an offset in the
@@ -101,10 +87,6 @@ def load_and_mask_miyawaki_data():
     
     
     sys.stderr.write(" Done (%.2fs).\n" % (time.time() - t0))
+
     
     return fmri_data, stimuli, fmri_figures_data, stimuli_figures, masker
-
-def inverse_transform_fmri_data(X):
-    mask_img=miyawaki_dataset.mask
-    new_img = unmask(X, mask_img, order="F")
-    return new_img
