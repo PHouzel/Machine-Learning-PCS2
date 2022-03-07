@@ -82,6 +82,10 @@ def load_and_mask_miyawaki_data():
     stimuli_figures = np.reshape(stimuli_figures, (-1, stimulus_shape[0] * stimulus_shape[1]))
     print("Preprocessed stimuli data: " + str(stimuli.shape[0]) + " samples x "+ str(stimuli.shape[1])+" pixels")
     
+    # Do -1 (black images) --> 0 (code for black in all other images)
+    stimuli = np.array([[0 if k == -1 else k for k in stim] for stim in stimuli])
+    stimuli_figures = np.array([[0 if k == -1 else k for k in stim] for stim in stimuli_figures])
+    
     #Figures
     print(str(stimuli_figures.shape[0]) + " geometrical figures")
     
@@ -90,3 +94,5 @@ def load_and_mask_miyawaki_data():
 
     
     return fmri_data, stimuli, fmri_figures_data, stimuli_figures, masker
+
+#un commentaire
