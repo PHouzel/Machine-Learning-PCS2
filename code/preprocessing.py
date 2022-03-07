@@ -84,7 +84,7 @@ def load_and_mask_miyawaki_data():
     
     # Do -1 (black images) --> 0 (code for black in all other images)
     stimuli = np.array([[0 if k == -1 else k for k in stim] for stim in stimuli])
-    stimuli_figures = np.array([[0 if k == -1 else k for k in stim] for stim in stimuli])
+    stimuli_figures = np.array([[0 if k == -1 else k for k in stim] for stim in stimuli_figures])
     
     #Figures
     print(str(stimuli_figures.shape[0]) + " geometrical figures")
