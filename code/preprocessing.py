@@ -94,5 +94,3 @@ def load_and_mask_miyawaki_data():
 
     
     return fmri_data, stimuli, fmri_figures_data, stimuli_figures, masker
-
-#un commentaire
